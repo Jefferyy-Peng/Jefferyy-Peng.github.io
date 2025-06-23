@@ -11,6 +11,7 @@ Currently, I am a PhD student at the University of Delaware, working in the Deep
 
 Previously, I am a Master student researching Brain-Computer Interface (BCI) and foundation model for interpreting BCI signals at the Liinc Lab at Columbia University. I was also a research intern at CHDI Foundation developing segmentation foundation model for facilitating diagnosis of Huntington's Disease, a progressive neurodegenerative disorder.
 
+
 ## Research Projects
 
 Then I get traped in research AI for its fascinating capability in various tasks and its good interpretability compared to biological brains. I'm generally interested in how intelligence (which I consider is the generalizability) come into place. My mental model for this now is an analogy to how human evolves: 
