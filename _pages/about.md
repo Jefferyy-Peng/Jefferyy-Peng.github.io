@@ -44,9 +44,7 @@ I have published at top-tier conferences such as **ICML** and **CVPR**.
 
 I’m deeply curious about intelligence from both artificial and biological perspectives. My journey started at the intersection of **neuroscience** and **AI**, driven by the fundamental question:
 
-<small><i>
-What are the foundational principles that enable generalizable intelligence, in both machines and the human brain?
-</i></small>
+> *What are the foundational principles that enable generalizable intelligence, in both machines and the human brain?*
 
 Previously, I was a Master's student at **Columbia University**, where I conducted research in the [LIINC Lab](https://liinc.bme.columbia.edu/) on **Brain-Computer Interfaces (BCI)** and foundation models for interpreting brain signals, advised by Prof. [Paul Sajda](https://liinc.bme.columbia.edu/people/paul-sajda). 🧠⚡
 
