@@ -12,6 +12,8 @@
   pages={5854},
   preview={joss.05854-5.jpg},
   url={https://joss.theoj.org/papers/10.21105/joss.05854.pdf},
+  html={https://joss.theoj.org/papers/10.21105/joss.05854.pdf},
+  pdf={joss.05854.pdf},
   abbr={JOSS},
   year={2024}
 }
@@ -39,30 +41,35 @@ optimization that disentangles and localizes finegrained clinical concepts in a 
 show our model demonstrates superior performance in segmentation, detection, and beyond.},
   abbr={ICML},
   url={https://openreview.net/pdf?id=r3ZLefVUMO},
+  html={https://openreview.net/pdf?id=r3ZLefVUMO},
+  pdf={548_Why_Is_There_a_Tumor_Tell_.pdf},
 }
 
 @unpublished{peng2026circuitgeneralization,
   title = {Inside-Out: Measuring Generalization in Vision Transformers Through Inner Workings},
   author = {Yunxiang Peng, Mengmeng Ma, Ziyu Yao, Xi Peng},
   note = {Under review at CVPR 2026},
+  abstract={Reliable generalization metrics are fundamental to both the development and evaluation of machine learning models. Especially in high-stakes applications where labeled target data are scarce, evaluation of models' generalization performance under distribution shift is a pressing need. We focus on two practical scenarios: (1) Before deployment, how to select the best model for unlabeled target data? (2) After deployment, how to monitor model performance under distribution shift? The central need in both cases is a reliable, label-free proxy metric. Yet existing proxy metrics, such as model confidence or accuracy-on-the-line, are often unreliable as they only assess model outputs while ignoring the internal mechanisms that produce them. We address this limitation by introducing a new perspective: using a model’s inner working, i.e. circuits, as a predictive metric of generalization performance. Leveraging circuit discovery, we extract the causal interactions between internal representations as a circuit, from which we derive two metrics tailored to the two practical scenarios. (1) Before deployment, we introduce Dependency Depth Bias, which measures different models' generalization capability on target data. (2) After deployment, we propose Circuit Shift Score, which predicts a model's generalization under different distribution shifts. Across diverse tasks, both metrics demonstrate significantly improved correlation with generalization performance, outperforming existing proxies by an average of 11.0% and 45.3%, respectively.},
   year = {2026},
   preview = {circuit-cvpr26.jpg},
   abbr = {CVPR},
 }
 
-@unpublished{peng2026circuitgeneralization,
+@unpublished{peng2026SAE,
   title = {Seeing Is Not Believing: Detect and Interpret Cancer Segmentation Failures},
   author = {Mengmeng Ma, Yunxiang Peng, Tang Li, Lu Lin, Binsheng Zhao, Oguz Akin, Xi Peng},
   note = {Under review at CVPR 2026},
   year = {2026},
+  abstract={Accurate cancer segmentation is critical for clinical oncology, yet even state-of-the-art AI systems produce clinically significant errors. Current failure detection methods face two fundamental limitations: they cannot explain why failures occur, and improving detection sensitivity degrades segmentation quality, creating an untenable clinical trade-off between performance and reliability. We propose an approach that detects failures by examining a model's inner workings rather than its outputs. Using mechanistic interpretability tools such as Sparse Autoencoders (SAEs) to extract interpretable concepts from segmentation models, we discover that segmentation models learn clinically meaningful concepts (e.g., ``tumor,'' ``gland margin,'' ``transition zone'') in their hidden layers. Crucially, true positive and false positive predictions exhibit strikingly different concept activation patterns: true positives activate significantly more concepts with stronger magnitudes, revealing richer internal reasoning. We build hierarchical concept representations across network layers and train interpretable classifiers to identify failure patterns, enabling both accurate detection and human-understandable explanations. Experiments on prostate and pancreatic cancer datasets demonstrate that our approach outperforms output-based methods in failure detection while simultaneously maintaining good segmentation quality. },
   preview = {detect-cvpr26.jpg},
   abbr = {CVPR},
 }
 
-@unpublished{peng2026circuitgeneralization,
+@unpublished{peng2026SyMRI,
   title = {Learning-Based Synthetic MRI Post-Processing Framework for Automated Contrast Optimization and Brain Segmentation},
   author = {Yunxiang Peng, Jiyo S Athertya, Yajun Ma, Jody Corey-Bloom, Graeme M Bydder, Xi Peng, Jiang Du, Haiying Tang},
   note = {Under review at ISMRM 2026},
+  abstract={Synthetic MRI (SynMRI) enables computation of tissue relaxation maps (T1, T2, PD) that can be used to synthesize various contrast images1. Conventional T1W and T2W structural MRI scans and SynMRI post-acquisition pipelines, however, rely on manually chosen contrast parameters such as TR, TE, and TI, which are tuned through expert experience and visual inspection2. This manual approach may cause inconsistent contrasts across sites and is inefficient for large-scale studies. To address these challenges, we present a physics-informed, learning-based framework that automatically adjusts acquisition parameters jointly with downstream tasks. Inspired by the concept of joint optimization of data transformation3, the proposed framework incorporates MRI physics as a differentiable transformation layer, enabling the simultaneous optimization of contrast parameters and downstream segmentation modules.},
   year = {2026},
   abbr = {ISMRM},
 }
