@@ -18,13 +18,27 @@ This post summarizes the theoretical framework of diffusion models, covering the
 Diffusion models can be formalized through three primary frameworks: **Denoising Diffusion Probabilistic Models (DDPMs)**, **Score-based Generative Models (SGMs)**, and **Stochastic Differential Equations (SDEs)**.
 
 ### 2.1.1 Denoising Diffusion Probabilistic Models (DDPMs)
-The DDPM framework defines a forward Markov chain that gradually adds Gaussian noise to data $x_0$ until it approximates an isotropic Gaussian distribution $x_T$. The transition kernel is defined as:
+The DDPM framework defines a forward Markov chain that gradually adds Gaussian noise
+to data \(x_0\) until it approaches an isotropic Gaussian distribution \(x_T\).
+The transition kernel is defined as:
+\[
+q(x_t \mid x_{t-1})=\mathcal{N}\!\left(x_t;\sqrt{1-\beta_t}\,x_{t-1},\beta_t I\right),
+\]
+where \(\beta_t \in (0,1)\) controls the noise variance.
 
-$$q(x_t | x_{t-1}) = \mathcal{N}(x_t; \sqrt{1 - \beta_t}x_{t-1}, \beta_t I)$$
+Let \(\alpha_t := 1-\beta_t\) and \(\bar{\alpha}_t := \prod_{s=1}^{t} \alpha_s\).
+Then the marginal distribution is:
+\[
+q(x_t \mid x_0)=\mathcal{N}\!\left(x_t;\sqrt{\bar{\alpha}_t}\,x_0,(1-\bar{\alpha}_t)I\right).
+\]
 
-where $\beta_t\in(0,1)$ controls the noise variance as a function of $t$. Let $\alpha_t := 1 - \beta_t \quad$ and $\quad \bar{\alpha}_t := \prod_{s=0}^{t} \alpha_s$, we have:
-$$q(x_t | x_0) = \mathcal{N}(x_t; \sqrt{\bar{\alpha}_t}x_{t-1}, \sqrt{1-\bar{\alpha}_t} I)$$, with a gassuian noise $\epsilon\sim\mathcal{N}(0, I)$, any noised data is a function of $t$ and $x_0$:
-$$x_t=\sqrt{\bar{\alpha}_t}x_0+\sqrt{1+\bar{\alpha}_t}\epsilon$$
+Using the reparameterization trick with \(\epsilon \sim \mathcal{N}(0,I)\),
+we can write:
+\[
+x_t=\sqrt{\bar{\alpha}_t}\,x_0
++
+\sqrt{1-\bar{\alpha}_t}\,\epsilon.
+\]
 
 The generative capability arises from learning a parameterized reverse Markov chain. The model estimates the transition kernel $p_\theta(x_{t-1} | x_t)$ to iteratively denoise the latent variables:
 
@@ -238,14 +252,10 @@ These models operate directly on high-dimensional image data.
 *   **GLIDE:** Uses classifier-free guidance to generate photorealistic images and demonstrates capabilities in text-guided inpainting [15].
 *   **Imagen:** A key finding from the development of Imagen is the scaling law regarding text encoders. The authors discovered that increasing the size of the language model (e.g., using T5-XXL) yields greater improvements in image fidelity and image-text alignment than increasing the size of the visual diffusion model itself [16].
 
-> **Figure 2.4:** Samples from Imagen demonstrating high compositional aptitude, such as "A brain riding a rocketship," highlighting the semantic strength provided by large language models [17].
-
 ### 2.3.2 Latent-based Models
 To address the high computational costs of pixel-space diffusion, **Latent Diffusion Models (LDMs)** utilize an autoencoder to project data into a lower-dimensional latent space [18].
 *   **Stable Diffusion:** Applies the diffusion process within this compressed latent space, utilizing cross-attention mechanisms to incorporate text conditioning. This architecture significantly improves inference efficiency [19].
 *   **DALL-E 2 (unCLIP):** Utilizes the CLIP embedding space. It generates an image embedding from text and then decodes this embedding into an image, leveraging the joint multimodal space learned by CLIP [20].
-
-> **Figure 2.5:** The LDM architecture separates perceptual compression (Autoencoder) from semantic generation (Diffusion in Latent Space), allowing for efficient training on consumer hardware [21].
 
 ## 2.4 Failure Modes and Limitations
 
