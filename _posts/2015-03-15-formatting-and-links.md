@@ -7,15 +7,9 @@ tags: formatting links
 categories: sample-posts
 ---
 
-Here is the Markdown code for the blog post based on the sources provided. You can copy and paste this directly into a `.md` file.
-
-```markdown
 # De-mystifying the Magic: How Diffusion Models Actually Work
-**Based on Section 2 of "Factorization and Compositional Generalization in Diffusion Models"**
 
-If you have ever typed "an astronaut riding a horse on Mars" into DALL-E 2 or Stable Diffusion and watched a masterpiece appear, you have witnessed the power of **Diffusion Models**. But how do they turn random static into art?
-
-In this post, we will walk through the core logic of these models—from the math of "destroying" data to the state-of-the-art architectures that reconstruct it.
+This blog is a summarization of mathmetic foundations of diffusion models and how diffusion models have evolved. I will walk through the core logic of these models—from the math of "destroying" data to the state-of-the-art architectures that reconstruct it.
 
 ---
 
@@ -104,4 +98,3 @@ Even these powerful models make funny mistakes. Section 2.3.3 highlights several
 ***
 
 **Summary:** Diffusion models work by mastering the art of noise removal. Whether working in pixel space (Imagen) or latent space (Stable Diffusion), and using clever tricks like classifier-free guidance, they have revolutionized AI art. However, their struggle with logic (binding) and physics shows we still have work to do!
-```
