@@ -40,7 +40,7 @@ x_t=\sqrt{\bar{\alpha}_t}\,x_0
 \sqrt{1-\bar{\alpha}_t}\,\epsilon.
 $$
 
-The generative capability arises from learning a parameterized reverse Markov chain. The model estimates the transition kernel $$p_\theta(x_{t-1}|x_t)$$ to iteratively denoise the latent variables:
+The generative capability arises from learning a parameterized reverse Markov chain. The model estimates the transition kernel $$p_\theta(x_{t-1}\mid x_t)$$ to iteratively denoise the latent variables:
 
 $$p_\theta(x_{t-1} | x_t) = \mathcal{N}(x_{t-1}; \mu_\theta(x_t, t), \Sigma_\theta(x_t, t))$$
 
