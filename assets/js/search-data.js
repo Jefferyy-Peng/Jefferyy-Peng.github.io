@@ -37,15 +37,15 @@ ninja.data = [{
           handler: () => {
             window.location.href = "/teaching/";
           },
-        },{id: "post-a-post-with-formatting-and-links",
+        },{id: "post-how-diffusion-models-work",
         
-          title: "a post with formatting and links",
+          title: "How Diffusion Models Work",
         
-        description: "march &amp; april, looking forward to summer",
+        description: "A learning notebook for diffusion models",
         section: "Posts",
         handler: () => {
           
-            window.location.href = "/blog/2015/formatting-and-links/";
+            window.location.href = "/blog/2025/diffusion-model/";
           
         },
       },{id: "books-the-godfather",
