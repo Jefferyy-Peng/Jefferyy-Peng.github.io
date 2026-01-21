@@ -18,11 +18,11 @@ This post summarizes the theoretical framework of diffusion models, covering the
 Diffusion models can be formalized through three primary frameworks: **Denoising Diffusion Probabilistic Models (DDPMs)**, **Score-based Generative Models (SGMs)**, and **Stochastic Differential Equations (SDEs)**.
 
 ### 2.1.1 Denoising Diffusion Probabilistic Models (DDPMs)
-The DDPM framework defines a forward Markov chain that gradually adds Gaussian noise to data \(x_0\) until it approaches an isotropic Gaussian distribution \(x_T\).
+The DDPM framework defines a forward Markov chain that gradually adds Gaussian noise to data $$x_0$$ until it approaches an isotropic Gaussian distribution $$x_T$$.
 The transition kernel is defined as:
 $$
 q(x_t \mid x_{t-1})=\mathcal{N}\!\left(x_t;\sqrt{1-\beta_t}\,x_{t-1},\beta_t I\right),
-$$ where \(\beta_t \in (0,1)\) controls the noise variance.
+$$ where $$\beta_t \in (0,1)$$ controls the noise variance.
 
 Let $$\alpha_t := 1-\beta_t$$ and $$\bar{\alpha}_t := \prod_{s=1}^{t} \alpha_s$$.
 Then the marginal distribution is:
@@ -31,24 +31,29 @@ $$
 q(x_t \mid x_0)=\mathcal{N}\!\left(x_t;\sqrt{\bar{\alpha}_t}\,x_0,(1-\bar{\alpha}_t)I\right).
 $$
 
-Using the reparameterization trick with \(\epsilon \sim \mathcal{N}(0,I)\),
+Using the reparameterization trick with $$\epsilon \sim \mathcal{N}(0,I)$$,
 we can write:
+
 $$
 x_t=\sqrt{\bar{\alpha}_t}\,x_0
 +
 \sqrt{1-\bar{\alpha}_t}\,\epsilon.
 $$
 
-The generative capability arises from learning a parameterized reverse Markov chain. The model estimates the transition kernel $$p_\theta(x_{t-1} | x_t)$$ to iteratively denoise the latent variables:
+The generative capability arises from learning a parameterized reverse Markov chain. The model estimates the transition kernel $$p_\theta(x_{t-1}|x_t)$$ to iteratively denoise the latent variables:
 
 $$p_\theta(x_{t-1} | x_t) = \mathcal{N}(x_{t-1}; \mu_\theta(x_t, t), \Sigma_\theta(x_t, t))$$
 
 Training is typically performed by optimizing a variational lower bound (ELBO) on the negative log-likelihood.
->**Step 1**: Marginalize likelihood: the probability of \(x_0\) is obtained by integrating out all latent variables \(x_{1:T}\). This integral is generally intractable.$$
+>**Step 1**: Marginalize likelihood: the probability of $$x_0$$ is obtained by integrating out all latent variables $$x_{1:T}$$. This integral is generally intractable.
+
+$$
 \mathbb{E}\big[-\log p_\theta(x_0)\big]
 = \mathbb{E}\left[-\log \int p_\theta(x_{0:T}) \, dx_{1:T}\right]
 $$
-**Step 2**: Introduce an auxiliary (variational) distribution \(q(x_{1:T}\mid x_0)\) by multiplying and dividing inside the integral.
+
+**Step 2**: Introduce an auxiliary (variational) distribution $$q(x_{1:T}\mid x_0)$$ by multiplying and dividing inside the integral.
+
 $$
 = \mathbb{E}\left[
 -\log \int p_\theta(x_{0:T}) 
@@ -56,19 +61,25 @@ $$
 \, dx_{1:T}
 \right]
 $$
-**Step 3**: Apply Jensen’s inequality $$-\log$$ is convex), moving the log inside the expectation. This produces an upper bound on the negative log-likelihood. 
+
+**Step 3**: Apply Jensen’s inequality $$-\log$$ is convex, moving the log inside the expectation. This produces an upper bound on the negative log-likelihood. 
+
 $$
 \le \mathbb{E}_q\left[
 -\log \frac{p_\theta(x_{0:T})}{q(x_{1:T}\mid x_0)}
 \right]
 $$
+
 **Step 4**: Next, factorize the model and variational distributions
+
 $$
 p_\theta(x_{0:T}) = p(x_T)\prod_{t=1}^{T} p_\theta(x_{t-1}\mid x_t),
 \quad
 q(x_{1:T}\mid x_0) = \prod_{t=1}^{T} q(x_t\mid x_{t-1})
 $$
+
 **Step 5**: Substituting these factorizations:
+
 $$
 = \mathbb{E}_q\left[
 -\log p(x_T)- \sum_{t=1}^{T}
@@ -78,7 +89,8 @@ $$
  := \mathcal{L}
 $$
 
-The first term $\mathbb{E}_q[-\log p(x_T)]$ is fixed and not optimizable, so we optimize the second term:
+The first term $$\mathbb{E}_q[-\log p(x_T)]$$ is fixed and not optimizable, so we optimize the second term:
+
 $$
   \mathbb{E}_{q(x_{t-1}, x_t)}
 \left[
@@ -95,13 +107,14 @@ p_\theta(x_{t-1} \mid x_t)
 \Big]
 +
 \text{const}$$
-this is equavalent to a noise-prediction objective, where a neural network $\epsilon_\theta$ (typically a UNet) minimizes the error between the added noise $\epsilon$ and the predicted noise:
+
+this is equavalent to a noise-prediction objective, where a neural network $$\epsilon_\theta$$ (typically a UNet) minimizes the error between the added noise $$\epsilon$$ and the predicted noise:
 
 $$L = \mathbb{E} [ \lambda(t)||\epsilon - \epsilon_\theta(x_t, t)||^2 ]$$
 
 ### 2.1.2 Score-based Generative Models (SGMs) and SDEs
-Alternative formulations focus on the gradient of the log-density of the data instead of noise being added, known as the score function $\nabla_x \log p(x)$ [6].
-*   **SGMs:** In score-based generative modeling, we train a **Noise-Conditioned Score Network (NCSN)** \(s_\theta(x,t)\) to approximate the score (gradient of the log-density) of data corrupted by Gaussian noise. The classical score-matching objective is
+Alternative formulations focus on the gradient of the log-density of the data instead of noise being added, known as the score function $$\nabla_x \log p(x)$$.
+*   **SGMs:** In score-based generative modeling, we train a **Noise-Conditioned Score Network (NCSN)** $$s_\theta(x,t)$$ to approximate the score (gradient of the log-density) of data corrupted by Gaussian noise. The classical score-matching objective is
 
 $$
 \frac{1}{2}\,\mathbb{E}_{p_{\text{data}}}
@@ -109,7 +122,8 @@ $$
 s_\theta(x) - \nabla_x \log p_{\text{data}}(x)
 \big\|^2 .
 $$
-Let \(x_0 \sim q(x_0)\) denote clean data, and define a family of noisy distributions via
+
+Let $$x_0 \sim q(x_0)$$ denote clean data, and define a family of noisy distributions via
 
 $$
 q(x_t \mid x_0) = \mathcal{N}(x_t; x_0, \sigma_t^2 I),
@@ -117,7 +131,7 @@ q(x_t \mid x_0) = \mathcal{N}(x_t; x_0, \sigma_t^2 I),
 q(x_t) = \int q(x_t \mid x_0) q(x_0)\,dx_0 .
 $$
 
-Conditioning the score network on the noise level \(t\), the score-matching objective becomes (up to a constant factor):
+Conditioning the score network on the noise level $$t$$, the score-matching objective becomes (up to a constant factor):
 
 $$
 \mathbb{E}_{t \sim \mathcal{U}[1,T],\, x_0 \sim q(x_0),\, x_t \sim q(x_t \mid x_0)}
@@ -127,7 +141,9 @@ s_\theta(x_t, t) - \nabla_x \log q(x_t \mid x_0)
 \big\|^2
 \right].
 $$
+
 The relation between DDPM and SGM is then 
+
 $$
 \boxed{
 \epsilon_\theta(x,t) = -\,\sigma_t\, s_\theta(x,t)
@@ -145,11 +161,11 @@ dx = f(x,t)\,dt + g(t)\,dw,
 $$
 
 where:
-- \(f(x,t)\) is the **drift (diffusion) term**,
-- \(g(t)\) controls the **noise magnitude**,
-- \(w\) is a standard Wiener process.
+- $$f(x,t)$$ is the **drift (diffusion) term**,
+- $$g(t)$$ controls the **noise magnitude**,
+- $$w$$ is a standard Wiener process.
 
-This SDE defines a family of marginal distributions \(q_t(x)\) over time.
+This SDE defines a family of marginal distributions $$q_t(x)$$ over time.
 
 #### DDPM as a Special Case
 
@@ -159,7 +175,7 @@ $$
 dx = -\frac{1}{2}\beta(t)\,x\,dt + \sqrt{\beta(t)}\,dw,
 $$
 
-where \(\beta(t)\) is a continuous noise schedule. This formulation mirrors the discrete DDPM noising process in the limit of infinitely many steps.
+where $$\beta(t)$$ is a continuous noise schedule. This formulation mirrors the discrete DDPM noising process in the limit of infinitely many steps.
 
 #### SGM as a Special Case
 
@@ -169,7 +185,7 @@ $$
 dx = \sqrt{\frac{d[\sigma_t^2]}{dt}}\,dw,
 $$
 
-where \(\sigma(t)\) is the continuous noise scale. Here, the forward process is a pure diffusion without drift.
+where $$\sigma(t)$$ is the continuous noise scale. Here, the forward process is a pure diffusion without drift.
 
 #### Reverse-Time SDE (Sampling Process)
 
@@ -180,8 +196,8 @@ dx = \big[f(x,t) - g(t)^2 \nabla_x \log q_t(x)\big]\,dt + g(t)\,d\bar{w},
 $$
 
 where:
-- \(\nabla_x \log q_t(x)\) is the **score function**,
-- \(\bar{w}\) is a backward-time Wiener process.
+- $$\nabla_x \log q_t(x)$$ is the **score function**,
+- $$\bar{w}$$ is a backward-time Wiener process.
 
 Learning the score function enables generation of samples by simulating this reverse SDE.
 
@@ -210,8 +226,8 @@ To enable controllable generation (e.g., text-to-image synthesis), diffusion mod
 ### 2.2.1 Classifier Guidance
 This approach leverages an auxiliary classifier $p_\phi(c | x_t)$ trained on noisy images. The denoising process can be expressed:
 $$p_{\theta,\phi}(x_t \mid x_{t+1}, c)=Z \, p_\theta(x_t \mid x_{t+1}) \, p_\phi(c \mid x_t)$$
-where \(Z\) is a normalization constant.
-Taking the gradient of the log of the conditional density (ignoring \(Z\)):
+where $$Z$$ is a normalization constant.
+Taking the gradient of the log of the conditional density (ignoring $$Z$$):
 
 $$
 \nabla_{x_t} \log \big(
