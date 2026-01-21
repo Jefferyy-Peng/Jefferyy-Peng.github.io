@@ -46,32 +46,41 @@ $$p_\theta(x_{t-1} | x_t) = \mathcal{N}(x_{t-1}; \mu_\theta(x_t, t), \Sigma_\the
 
 Training is typically performed by optimizing a variational lower bound (ELBO) on the negative log-likelihood.
 >**Step 1**: Marginalize likelihood: the probability of $$x_0$$ is obtained by integrating out all latent variables $$x_{1:T}$$. This integral is generally intractable.
-$$
+>
+>$$
 \mathbb{E}\big[-\log p_\theta(x_0)\big]
 = \mathbb{E}\left[-\log \int p_\theta(x_{0:T}) \, dx_{1:T}\right]
 $$
-**Step 2**: Introduce an auxiliary (variational) distribution $$q(x_{1:T}\mid x_0)$$ by multiplying and dividing inside the integral.
-$$
+>
+>**Step 2**: Introduce an auxiliary (variational) distribution $$q(x_{1:T}\mid x_0)$$ by multiplying and dividing inside the integral.
+>
+>$$
 = \mathbb{E}\left[
 -\log \int p_\theta(x_{0:T}) 
 \frac{q(x_{0:T})}{q(x_{0:T})}
 \, dx_{1:T}
 \right]
 $$
-**Step 3**: Apply Jensen’s inequality $$-\log$$ is convex, moving the log inside the expectation. This produces an upper bound on the negative log-likelihood. 
-$$
+>
+>**Step 3**: Apply Jensen’s inequality $$-\log$$ is convex, moving the log inside the expectation. This produces an upper bound on the negative log-likelihood. 
+>
+>$$
 \le \mathbb{E}_q\left[
 -\log \frac{p_\theta(x_{0:T})}{q(x_{1:T}\mid x_0)}
 \right]
 $$
-**Step 4**: Next, factorize the model and variational distributions
-$$
+>
+>**Step 4**: Next, factorize the model and variational distributions
+>
+>$$
 p_\theta(x_{0:T}) = p(x_T)\prod_{t=1}^{T} p_\theta(x_{t-1}\mid x_t),
 \quad
 q(x_{1:T}\mid x_0) = \prod_{t=1}^{T} q(x_t\mid x_{t-1})
 $$
-**Step 5**: Substituting these factorizations:
-$$
+>
+>**Step 5**: Substituting these factorizations:
+>
+>$$
 = \mathbb{E}_q\left[
 -\log p(x_T)- \sum_{t=1}^{T}
 \log \frac{p_\theta(x_{t-1}\mid x_t)}
@@ -79,8 +88,10 @@ $$
 \right]
  := \mathcal{L}
 $$
-The first term $$\mathbb{E}_q[-\log p(x_T)]$$ is fixed and not optimizable, so we optimize the second term:
-$$
+>
+>The first term $$\mathbb{E}_q[-\log p(x_T)]$$ is fixed and not optimizable, so we optimize the second term:
+>
+>$$
   \mathbb{E}_{q(x_{t-1}, x_t)}
 \left[
 \log \frac{q(x_t \mid x_{t-1})}
@@ -93,11 +104,11 @@ q(x_{t-1} \mid x_t, x_0)
 \;\|\;
 p_\theta(x_{t-1} \mid x_t)
 \big)
-\Big]
-+
-\text{const}$$
-this is equavalent to a noise-prediction objective, where a neural network $$\epsilon_\theta$$ (typically a UNet) minimizes the error between the added noise $$\epsilon$$ and the predicted noise:
-$$L = \mathbb{E} [ \lambda(t)||\epsilon - \epsilon_\theta(x_t, t)||^2 ]$$
+\Big]+\text{const}$$
+>
+>this is equavalent to a noise-prediction objective, where a neural network $$\epsilon_\theta$$ (typically a UNet) minimizes the error between the added noise $$\epsilon$$ and the predicted noise:
+>
+>$$L = \mathbb{E} [ \lambda(t)||\epsilon - \epsilon_\theta(x_t, t)||^2 ]$$
 
 ### 2.1.2 Score-based Generative Models (SGMs) and SDEs
 Alternative formulations focus on the gradient of the log-density of the data instead of noise being added, known as the score function $$\nabla_x \log p(x)$$.
