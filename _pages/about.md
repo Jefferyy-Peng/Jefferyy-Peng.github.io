@@ -29,7 +29,7 @@ latest_posts:
 
 I am a Ph.D. candidate in the [Computer & Information Science Department](https://www.cis.udel.edu/) at the [University of Delaware](https://www.udel.edu/), advised by [Prof. Xi Peng](https://deep-real.github.io/dr_xipeng.html) in the [DeepREAL Lab](https://deep-real.github.io/). 🧠🤖
 
-My research explores **interpretability** and **generalization**, focusing on how a model’s internal structure shapes its ability to generalize across diverse domains. I am especially interested in:
+My research explores **interpretability** and **generalization**, with the goal of understanding how models work and how they generalize. More specifically, I am interested in:
 
 - Interpretable Machine Learning
 - Vision-Language Models
