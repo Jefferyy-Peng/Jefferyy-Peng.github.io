@@ -1,19 +1,10 @@
 ---
 layout: post
 title: Generalization Through Variance in Diffusion Models
-date: 2025-05-21 16:40:16
+date: 2025-11-21 16:40:16
 description: Paper summary for "Generalization through Variance in Diffusion Models"
 tags: Learning
 categories: sample-posts
----
-
-
-
-**Formatting rules (per your request):**
-- Every equation (inline or display) is wrapped in $$ ... $$.
-- I use LaTeX backslashes as single characters: I write $\text{like } \alpha_t$ as $$\alpha_t$$, **not** $$\alpha_t$$.
-- This writeup follows the **logic of the paper** and explicitly includes/answers the questions we discussed.
-
 ---
 
 ## 0. High-level roadmap (what the paper tries to do)
@@ -68,13 +59,6 @@ Define diffusion tensor:
 $$
 D_t := \frac{G_t G_t^\top}{2}\in \mathbb R^{D\times D}.
 $$
-
-#### Your question: “why negative sign? if t=0 then x_t = -x_t?”
-Important: the equation is about the **derivative**, not equality of values.
-At $$t=0$$:
-- you set initial condition $$x_0 \sim p_{\text{data}}$$.
-- the SDE gives derivative mean drift $$\dot x_0 = -\beta_0 x_0 + \text{noise}$$.
-So it does **not** imply $$x_0 = -x_0$$; it implies the drift points toward the origin (mean-reverting), preventing explosion and ensuring the process approaches noise.
 
 ---
 
@@ -272,5 +256,485 @@ p(x\mid t)=\int p(x\mid x_0,t)p_{\text{data}}(x_0)\, dx_0.
 $$
 Differentiate w.r.t. $$x$$:
 $$
-\nabla_x p(x\mid t) = \int \nab_
+\nabla_x p(x\mid t) = \int \nabla_x p(x\mid x_0,t)p_{\text{data}}(x_0)\, dx_0.
+$$
+Rewrite:
+$$
+\nabla_x p(x\mid x_0,t) = p(x\mid x_0,t)\nabla_x \log p(x\mid x_0,t) = p(x\mid x_0,t)\tilde s(x,t;x_0).
+$$
+Thus:
+$$
+\nabla_x p(x\mid t)=\int p(x\mid x_0,t)\tilde s(x,t;x_0)p_{\text{data}}(x_0)\, dx_0.
+$$
+But:
+$$
+p(x_0\mid x,t) = \frac{p(x\mid x_0,t)p_{\text{data}}(x_0)}{p(x\mid t)}.
+$$
+So divide by $$p(x\mid t)$$:
+$$
+\frac{\nabla_x p(x\mid t)}{p(x\mid t)} = \int \tilde s(x,t;x_0) p(x_0\mid x,t)\, dx_0.
+$$
+Left-hand side equals:
+$$
+\nabla_x \log p(x\mid t) = s(x,t).
+$$
+Therefore:
+$$
+s(x,t)=\mathbb E_{x_0\mid x,t}[\tilde s(x,t;x_0)].
+$$
+
+---
+
+### 4.3 Covariance of proxy score: derive the formula
+
+Define:
+$$
+C_{ij}(x,t) := \mathrm{Cov}_{x_0\mid x,t}[\tilde s_i, \tilde s_j]
+= \mathbb E[\tilde s_i\tilde s_j] - s_i s_j,
+$$
+where expectations are under $$p(x_0\mid x,t)$$.
+
+We want the identity:
+$$
+C(x,t)=S_t^{-1} + \nabla_x^2 \log p(x\mid t).
+$$
+
+#### Step 1: compute Hessian of log marginal
+Start with:
+$$
+s(x,t)=\nabla_x \log p(x\mid t)=\frac{\nabla_x p(x\mid t)}{p(x\mid t)}.
+$$
+Differentiate again:
+$$
+\nabla_x^2 \log p
+= \nabla_x\left(\frac{\nabla_x p}{p}\right)
+= \frac{\nabla_x^2 p}{p} - \frac{(\nabla_x p)(\nabla_x p)^\top}{p^2}.
+$$
+So:
+$$
+\nabla_x^2 \log p = \frac{\nabla_x^2 p}{p} - s s^\top.
+$$
+
+#### Step 2: express $$\nabla_x^2 p(x\mid t)$$ in terms of conditional objects
+We have:
+$$
+p(x\mid t)=\int p(x\mid x_0,t)p_{\text{data}}(x_0)\, dx_0.
+$$
+Differentiate twice:
+$$
+\nabla_x^2 p(x\mid t)=\int \nabla_x^2 p(x\mid x_0,t)p_{\text{data}}(x_0)\, dx_0.
+$$
+
+Now compute $$\nabla_x^2 p(x\mid x_0,t)$$:
+$$
+\nabla_x^2 p = \nabla_x(p\tilde s)= (\nabla_x p)\tilde s^\top + p\nabla_x\tilde s
+= p\tilde s\tilde s^\top + p\nabla_x\tilde s.
+$$
+Thus:
+$$
+\nabla_x^2 p(x\mid x_0,t) = p(x\mid x_0,t)\left(\tilde s\tilde s^\top + \nabla_x\tilde s\right).
+$$
+
+Integrate:
+$$
+\nabla_x^2 p(x\mid t)=\int p(x\mid x_0,t)\left(\tilde s\tilde s^\top + \nabla_x\tilde s\right)p_{\text{data}}(x_0)\, dx_0.
+$$
+Divide by $$p(x\mid t)$$ to convert to posterior expectation:
+$$
+\frac{\nabla_x^2 p(x\mid t)}{p(x\mid t)}
+= \mathbb E_{x_0\mid x,t}\left[\tilde s\tilde s^\top + \nabla_x\tilde s\right].
+$$
+
+#### Step 3: substitute into Hessian identity
+Recall:
+$$
+\nabla_x^2 \log p = \frac{\nabla_x^2 p}{p} - s s^\top.
+$$
+So:
+$$
+\nabla_x^2 \log p
+= \mathbb E[\tilde s\tilde s^\top + \nabla_x\tilde s] - s s^\top
+= \mathrm{Cov}(\tilde s) + \mathbb E[\nabla_x\tilde s].
+$$
+Therefore:
+$$
+\mathrm{Cov}(\tilde s) = \nabla_x^2 \log p - \mathbb E[\nabla_x\tilde s].
+$$
+
+#### Step 4: compute $$\nabla_x\tilde s$$ for Gaussian conditional
+We have:
+$$
+\tilde s(x,t;x_0)=S_t^{-1}(\alpha_t x_0 - x).
+$$
+Differentiate w.r.t. $$x$$:
+$$
+\nabla_x\tilde s = \nabla_x(-S_t^{-1} x) = -S_t^{-1}.
+$$
+This is constant (independent of $$x_0$$). So:
+$$
+\mathbb E_{x_0\mid x,t}[\nabla_x\tilde s] = -S_t^{-1}.
+$$
+
+Substitute:
+$$
+\mathrm{Cov}(\tilde s) = \nabla_x^2 \log p - (-S_t^{-1})
+= S_t^{-1} + \nabla_x^2 \log p.
+$$
+
+So:
+$$
+C(x,t)=S_t^{-1} + \nabla_x^2 \log p(x\mid t).
+$$
+
+**Interpretation (from our discussion):**
+- As $$t\to 0$$, $$S_t\to 0$$ so $$S_t^{-1}$$ blows up: proxy-score covariance large at small times.
+- Large curvature $$\nabla_x^2 \log p$$ happens near modes and boundaries (e.g., for discrete mixtures).
+
+---
+
+### 4.4 Why proxy-score covariance matters for training and generalization
+
+Even though $$\tilde s$$ is unbiased for $$s$$, training on $$J_1$$ uses noisy targets.
+Empirically, finite neural nets trained on $$J_1$$ produce a sampling distribution different from the true-score PF-ODE.
+
+The paper’s thesis: **structured noise in the target induces structured variance in the learned estimator**, which translates into stochasticity in typical sampling, yielding generalization.
+
+---
+
+## 5. PF-ODE sampling and the “distribution of outputs”
+
+### 5.1 PF-ODE dynamics
+
+Sampling uses the probability flow ODE:
+$$
+\dot x_t = -\beta_t x_t - D_t s(x_t,t),\quad t:T\to \epsilon.
+$$
+In practice, you plug in the learned score estimator $$\hat s_\theta$$:
+$$
+\dot x_t = -\beta_t x_t - D_t \hat s_\theta(x_t,t).
+$$
+
+### 5.2 Deterministic mapping given $$\theta$$
+
+Fix:
+- the network parameters $$\theta$$
+- the initial noise seed $$x_T$$
+
+Then the ODE solution is deterministic:
+$$
+x_0 = F(x_T,\theta).
+$$
+
+### 5.3 Why the output distribution uses a delta
+
+Your question: why write
+$$
+\bar q(x_0\mid x_T) = \mathbb E_\theta[\delta(x_0 - F(x_T,\theta))]?
+$$
+
+Because this is the standard identity: for any random variable $$Y$$, its density can be written as:
+$$
+p_Y(y) = \mathbb E[\delta(y-Y)].
+$$
+
+#### Definition of Dirac delta
+The delta is defined by its action under integration:
+$$
+\int \delta(x-a) f(x) dx = f(a).
+$$
+Thus, if $$Y$$ is deterministic with value $$a$$, its distribution is $$\delta(x-a)$$.
+
+Here $$Y=F(x_T,\theta)$$ is random only through $$\theta$$; averaging those deltas gives the typical distribution.
+
+---
+
+## 6. Key technical tool: path integral representation of PF-ODE outputs (Eq. 6)
+
+### 6.1 Why we need it (connect to your earlier confusion)
+Directly averaging over $$F(x_T,\theta)$$ is hard because:
+- PF-ODE typically has no closed-form solution.
+- $$F$$ depends on $$\hat s_\theta$$ in a complicated, nonlinear, trajectory-dependent way.
+
+So the paper rewrites the deterministic constraint “this path satisfies the ODE” into an integral form where $$\hat s_\theta$$ appears linearly in an exponent.
+
+---
+
+### 6.2 Discrete-time derivation of the path integral idea (most intuitive)
+
+Discretize time:
+$$
+t_k = T - k\Delta t,\quad k=0,1,\dots,N,\quad t_N=\epsilon.
+$$
+
+Euler update for PF-ODE using estimator:
+$$
+x_{k+1} = x_k + \Delta t\left(\beta_{t_k} x_k + D_{t_k}\hat s_\theta(x_k,t_k)\right).
+$$
+Rearrange:
+$$
+x_{k+1} - x_k - \Delta t(\beta_{t_k}x_k + D_{t_k}\hat s_\theta(x_k,t_k)) = 0.
+$$
+
+Enforce each step by a delta:
+$$
+\delta\left(x_{k+1}-x_k-\Delta t(\beta_{t_k}x_k + D_{t_k}\hat s_\theta(x_k,t_k))\right).
+$$
+
+Now enforce delta via Fourier representation (finite-dimensional):
+$$
+\delta(y) = \int \frac{dp}{(2\pi)^D}\exp(ip\cdot y).
+$$
+
+Introduce an auxiliary $$p_k$$ per time step:
+$$
+\delta(\cdots) = \int dp_k \exp\left(ip_k\cdot\left[x_{k+1}-x_k-\Delta t(\beta_{t_k}x_k + D_{t_k}\hat s_\theta(x_k,t_k))\right]\right).
+$$
+
+Multiply over all steps and integrate over intermediate states $$\{x_k\}$$ and auxiliaries $$\{p_k\}$$.
+In the continuous-time limit, this becomes the functional integral (Eq. 6):
+$$
+q(x_0\mid x_T;\theta)
+=
+\int \mathcal D[p_t]\mathcal D[x_t]\,
+\exp\left(
+\int_T^\epsilon i p_t\cdot[\dot x_t+\beta_t x_t + D_t \hat s_\theta(x_t,t)]dt
+\right).
+$$
+
+#### Your question: “If the residual is zero, how do paths contribute anything?”
+Because integrating over $$p_t$$ creates a delta-functional:
+$$
+\int \mathcal D[p_t]\exp\left(i\int p_t\cdot R_t[x]dt\right) \propto \delta[R_t[x]].
+$$
+This delta-functional equals “1” on paths where $$R_t[x]=0$$ (ODE satisfied), and “0” otherwise.
+So ODE-consistent paths contribute by **surviving**, not by making the exponent nonzero.
+
+---
+
+## 7. Ensemble averaging: cumulant expansion to get Eq. 7
+
+### 7.1 What is random?
+The score estimator $$\hat s_\theta(x,t)$$ is random because $$\theta$$ depends on random finite training data (and optimization randomness).
+So $$q(x_0\mid x_T;\theta)$$ is random, and we want its ensemble average:
+$$
+[q(x_0\mid x_T)] := \mathbb E_\theta[q(x_0\mid x_T;\theta)].
+$$
+
+### 7.2 Why the average becomes tractable
+Inside Eq. 6, the dependence on $$\hat s_\theta$$ is linear in the exponent:
+$$
+\exp\left(\int i p_t\cdot D_t \hat s_\theta(x_t,t)dt\right).
+$$
+So we need to average an exponential of a linear functional:
+$$
+\mathbb E_\theta\left[\exp\left(\int J_t\cdot \hat s_\theta(x_t,t) dt\right)\right],
+$$
+where $$J_t := i D_t^\top p_t$$.
+
+This is a **characteristic functional**.
+Its log admits a cumulant expansion:
+$$
+\log \mathbb E[e^{Z}] = \kappa_1(Z) + \frac{1}{2}\kappa_2(Z) + \frac{1}{6}\kappa_3(Z)+\cdots,
+$$
+where $$\kappa_n$$ are cumulants.
+
+With $$Z$$ linear in $$\hat s_\theta$$:
+- $$\kappa_1$$ depends on the mean of $$\hat s_\theta$$
+- $$\kappa_2$$ depends on the covariance of $$\hat s_\theta$$
+- higher cumulants correspond to non-Gaussianity
+
+Thus the paper obtains:
+$$
+[q(x_0\mid x_T)]
+=
+\int \mathcal D[p_t]\mathcal D[x_t]\,
+\exp\left(M_1 - \frac{1}{2}M_2 + \cdots\right).
+$$
+
+### 7.3 Define $$s_{\text{avg}}$$ and V-kernel precisely
+Mean score:
+$$
+s_{\text{avg}}(x,t) := [\hat s_\theta(x,t)] = \mathbb E_\theta[\hat s_\theta(x,t)].
+$$
+
+Covariance kernel:
+$$
+\mathrm{Cov}_\theta[\hat s(x,t),\hat s(x',t')] := \mathbb E_\theta[(\hat s-s_{\text{avg}})(\hat s'-s_{\text{avg}}')^\top].
+$$
+
+V-kernel (as defined by paper):
+$$
+V(x,t;x',t') := D_t \mathrm{Cov}_\theta[\hat s(x,t),\hat s(x',t')] D_{t'}.
+$$
+
+### 7.4 Write $$M_1$$ and $$M_2$$
+$$
+M_1 := \int_T^\epsilon i p_t\cdot[\dot x_t + \beta_t x_t + D_t s_{\text{avg}}(x_t,t)]dt,
+$$
+$$
+M_2 := \int_T^\epsilon\int_T^\epsilon p_t^\top V(x_t,t;x_{t'},t') p_{t'} dt dt'.
+$$
+
+---
+
+## 8. Gaussian approximation and the Effective SDE (Eq. 8 / Proposition 3.1)
+
+### 8.1 Dropping higher cumulants
+Assume the distribution of the estimator across training randomness is approximately Gaussian.
+Then higher cumulants vanish, so only $$M_1$$ and $$M_2$$ remain.
+
+### 8.2 From quadratic form to noise: the key idea
+With a Gaussian field, averaging produces a quadratic term $$M_2$$ in the exponent.
+Quadratic terms in an action correspond to Gaussian noise in an equivalent SDE description.
+
+The result: sampling from $$[q(x_0\mid x_T)]$$ is equivalent to integrating an SDE:
+$$
+\dot x_t = -\beta_t x_t - D_t s_{\text{avg}}(x_t,t) + \xi(x_t,t),
+$$
+with:
+$$
+\mathbb E[\xi(x_t,t)]=0,
+$$
+$$
+\mathbb E[\xi(x_t,t)\xi(x_{t'},t')^\top] = V(x_t,t;x_{t'},t').
+$$
+
+### 8.3 Key conceptual consequence (the paper’s main interpretive statement)
+- If $$\hat s$$ is unbiased so $$s_{\text{avg}}=s$$,
+- then deterministic drift matches the true PF-ODE,
+- and the only difference is the noise term controlled by V-kernel.
+
+Thus:
+- $$V=0$$ implies the effective dynamics reduce to deterministic PF-ODE, which (for discrete training data) reproduces training examples (memorization).
+- $$V\ne 0$$ implies added stochasticity, causing probability mass to spread and generalize.
+
+---
+
+## 9. Toy construction: Naive score estimator generalizes (Proposition 4.1)
+
+This part constructs an explicit scheme showing how a nontrivial V-kernel arises even if one uses proxy scores directly.
+
+### 9.1 Discretized PF-ODE sampling with Euler steps
+Integrate backward with Euler:
+$$
+x_{t-\Delta t} = x_t + \Delta t\beta_t x_t + \Delta t D_t (\text{score used at time }t).
+$$
+
+### 9.2 At each step sample an endpoint $$x_{0t}$$ from the posterior
+Sample:
+$$
+x_{0t} \sim p(x_0\mid x_t,t) = \frac{p(x_t\mid x_0,t)p_{\text{data}}(x_0)}{p(x_t\mid t)}.
+$$
+This captures the ambiguity of which training example could have generated the current noisy point.
+
+### 9.3 Define the naive estimator used in that step
+Construct:
+$$
+\hat s(x_t,t) := s(x_t,t) + \sqrt{\frac{\kappa}{\Delta t}}\left[\tilde s(x_t,t;x_{0t}) - s(x_t,t)\right].
+$$
+
+Interpretation:
+- The expected estimator equals $$s$$ because $$\mathbb E[\tilde s\mid x,t]=s$$.
+- But its variance is nonzero because $$\tilde s$$ varies with sampled $$x_{0t}$$.
+
+### 9.4 Plug into the Euler update (explicit form)
+The paper writes:
+$$
+x_{t-\Delta t} = x_t + \Delta t\beta_t x_t + \Delta t D_t s(x_t,t)
++ \sqrt{\kappa\Delta t}\, D_t\left[\tilde s(x_t,t;x_{0t})-s(x_t,t)\right].
+$$
+
+This is exactly of “drift + sqrt(Delta t) noise” form (Euler–Maruyama).
+
+### 9.5 Derive $$s_{\text{avg}}=s$$
+Compute ensemble mean over the fresh sampling of $$x_{0t}$$:
+$$
+[\hat s(x_t,t)] = s(x_t,t) + \sqrt{\frac{\kappa}{\Delta t}}\left[\mathbb E(\tilde s\mid x_t,t)-s\right] = s(x_t,t).
+$$
+
+So the mean drift is the true PF-ODE drift.
+
+### 9.6 Derive the V-kernel for this scheme
+Noise at time step is:
+$$
+\Delta x_{\text{noise}} = \sqrt{\kappa\Delta t}\, D_t(\tilde s - s).
+$$
+So its covariance (conditioned on $$x_t,t$$) is:
+$$
+\mathrm{Cov}(\Delta x_{\text{noise}})
+= \kappa\Delta t\, D_t \mathrm{Cov}(\tilde s\mid x_t,t) D_t.
+$$
+But $$\mathrm{Cov}(\tilde s\mid x_t,t)=C(x_t,t)$$ where:
+$$
+C(x,t)=S_t^{-1} + \nabla_x^2 \log p(x\mid t).
+$$
+
+If the samples $$x_{0t}$$ are independent across time steps, then noise is white in time.
+In continuous limit this yields:
+$$
+V(x_t,t;x_{t'},t') = \kappa D_t C(x_t,t) D_{t'} \delta(t-t').
+$$
+
+### 9.7 Interpret the result (why this implies generalization)
+- Even though this scheme uses proxy score draws tied to training data (so “memorization-like”),
+- the resampling injects noise proportional to proxy-score covariance.
+- Proxy-score covariance is high in boundary regions between training examples.
+So the effective sampling SDE has more diffusion in those boundary regions, which spreads mass between examples: that is generalization.
+
+---
+
+## 10. Final qualitative statement (connect to your last paragraph)
+
+The effective dynamics:
+- follow deterministic PF-ODE dynamics **in expectation** because noise mean is zero:
+$$
+\mathbb E[\xi]=0.
+$$
+- and are **most likely** to remain near deterministic PF-ODE paths because large deviations have lower probability under Gaussian noise.
+Thus the model still samples near training examples most of the time, but with nonzero V-kernel it also places mass in-between.
+
+This precisely matches the paper’s intended notion of “generalize but still prioritize training regions.”
+
+---
+
+## 11. Consolidated answers to the specific questions you raised
+
+### 11.1 Why negative sign in forward SDE?
+Because it is a mean-reverting drift term ensuring stability and convergence to noise. It does not imply $$x_0=-x_0$$; it implies $$\dot x_0$$ points toward 0.
+
+### 11.2 Why marginalization formula $$p(x\mid t)=\int p(x\mid x_0,t)p_{\text{data}}(x_0)dx_0$$?
+It is the law of total probability: marginalize out the latent clean point $$x_0$$.
+
+### 11.3 Why proxy score is $$S_t^{-1}(\alpha_t x_0-x)$$?
+It is the gradient of the log of a Gaussian density in $$x$$.
+
+### 11.4 Why $$\mathbb E[\tilde s\mid x,t]=s$$?
+Differentiate the mixture expression for $$p(x\mid t)$$ under the integral sign and use Bayes rule.
+
+### 11.5 Why covariance formula $$C=S_t^{-1}+\nabla_x^2\log p$$?
+Compute Hessian of log marginal and express it via posterior expectations; use $$\nabla_x \tilde s=-S_t^{-1}$$ for Gaussian conditional.
+
+### 11.6 Why distribution of deterministic output is delta?
+For fixed $$\theta,x_T$$ the output is exactly $$F(x_T,\theta)$$, so:
+$$
+q(x_0\mid x_T;\theta)=\delta(x_0-F(x_T,\theta)).
+$$
+
+### 11.7 Why ensemble average is $$\mathbb E_\theta[\delta(x_0-F(x_T,\theta))]$$ and not $$\mathbb E[F]$$?
+Because we want the full distribution (mass placement), not the mean output. The delta identity defines the induced distribution.
+
+### 11.8 Why path integral helps?
+It replaces “solve a complicated ODE” with “integrate over paths constrained to satisfy the ODE,” turning dependence on $$\hat s_\theta$$ into a linear functional in an exponent so cumulant methods apply.
+
+### 11.9 Why “if residual is zero, how can it contribute”?
+Because integrating over $$p_t$$ enforces the constraint via a delta-functional; ODE-consistent paths survive with nonzero weight, inconsistent paths cancel out.
+
+### 11.10 Why averaging $$\mathbb E_\theta[\exp(\int p_t\cdot D_t \hat s_\theta dt)]$$ is tractable?
+Because it is a characteristic functional; its log expands in cumulants determined by mean and covariance of $$\hat s_\theta$$.
+
+---
+
+## 12. Final takeaway (paper’s central message)
+
+Diffusion models trained with DSM generalize because the learned score estimator varies across training realizations, producing a nonzero V-kernel that acts like an additional noise term in an effective SDE for typical sampling. This noise is largest precisely in regions of high proxy-score covariance, especially boundaries between training examples, causing probability mass to spread beyond memorization while still following deterministic score flow on average.
 
