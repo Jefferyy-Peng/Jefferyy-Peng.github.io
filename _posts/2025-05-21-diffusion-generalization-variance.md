@@ -742,89 +742,90 @@ Because it is a characteristic functional; its log expands in cumulants determin
 
 ---
 
-## 12. Implications
+## 12 Generalization Through Variance: Consequences and Example
 
-This section discusses the **implications** of the theory developed earlier.  
-The central claim is that *generalization arises through variance in the learned score*, and this section explains what kind of inductive bias this produces, when it does or does not lead to generalization, and how the V-kernel controls these effects.
+This section discusses the conceptual and practical consequences of generalization through variance.  
+Rather than introducing new technical machinery, it explains what kind of inductive bias the theory implies, when generalization occurs or does not occur, and how the V-kernel shapes the learned distribution.
 
 ---
 
 ### 12.1 Benign Properties of Generalization Through Variance
 
-The theory shows that generalization is driven by the **proxy score covariance**, which enters the effective dynamics through the V-kernel. Importantly, this covariance is **not arbitrary**: it has a highly constrained structure that limits how generalization can occur.
+The theory developed earlier shows that generalization arises through the V-kernel, which is determined by the covariance of the proxy score. Crucially, this covariance has a highly structured form, which strongly constrains how generalization can occur.
 
-#### Boundary-driven generalization
+---
 
-The proxy score covariance is large primarily in **boundary regions between training examples**. These are regions where the posterior distribution
+#### 12.1.1 Boundary-driven generalization
+
+The key driver of generalization through variance is the proxy score covariance, which is large primarily in boundary regions between training examples. These are regions where the posterior distribution
 
 $$
 p(x_0 \mid x,t)
 $$
 
-has substantial uncertainty, meaning that multiple training points could plausibly explain the same noisy observation \(x_t\).
+is uncertain, meaning that multiple training points could plausibly explain the same noisy observation $x_t$.
 
 As a result, generalization through variance:
-- does not create probability mass far from training data,
-- acts mainly in regions where the data distribution is ambiguous,
-- and is therefore highly constrained.
+- acts mainly in ambiguous regions between data points,
+- does not create probability mass arbitrarily far from the data,
+- and is therefore strongly constrained.
 
-This boundary-localized behavior is the key reason generalization through variance provides a **reasonable inductive bias**.
+This boundary-localized behavior is why generalization through variance provides a reasonable inductive bias.
 
 ---
 
-#### No generalization for a single data point
+#### 12.1.2 No generalization for a single data point
 
-If the dataset consists of a single training example (\(M = 1\)), then the posterior \(p(x_0 \mid x,t)\) is deterministic. In this case,
+If the dataset contains only one training example (so that $M = 1$), then the posterior $p(x_0 \mid x,t)$ is deterministic. In this case, the proxy score covariance vanishes:
 
 $$
-\mathrm{Cov}_{x_0 \mid x,t}[\tilde s(x,t;x_0)] = 0,
+\mathrm{Cov}_{x_0 \mid x,t}[\tilde s(x,t;x_0)] = 0.
 $$
 
-which implies that the V-kernel vanishes:
+Since the V-kernel is constructed from this covariance, it follows that
 
 $$
 V(x,t;x',t') = 0.
 $$
 
 Therefore:
-- the effective dynamics reduce to the deterministic PF-ODE,
+- the effective dynamics reduce exactly to the deterministic PF-ODE,
 - no stochasticity is introduced,
 - and no generalization occurs.
 
-This shows that **generalization requires ambiguity in the data distribution**.
+This shows that generalization requires ambiguity in the data distribution.
 
 ---
 
-#### Preservation of data manifold dimensionality
+#### 12.1.3 Preservation of data manifold dimensionality
 
-If the data distribution is supported on a low-dimensional manifold, then uncertainty in \(x_0 \mid x,t\) tends to lie **along that manifold**, not orthogonal to it.
+If the data distribution is supported primarily on a low-dimensional data manifold, then uncertainty in $p(x_0 \mid x,t)$ tends to lie along the manifold, not orthogonal to it.
 
 Consequently:
-- the proxy score covariance is nontrivial only in directions tangent to the data manifold,
-- and the V-kernel injects noise only along those directions.
+- the proxy score covariance is nontrivial only along manifold directions,
+- the V-kernel injects noise only in those directions.
 
-This means that generalization through variance:
+Thus, generalization through variance:
 - preserves the intrinsic dimensionality of the data,
 - rather than spreading probability mass into irrelevant regions of the ambient space.
 
 ---
 
-#### No extrapolation far from training data
+#### 12.1.4 No extrapolation far from training data
 
-Far from training examples, the posterior \(p(x_0 \mid x,t)\) becomes sharply peaked. In this regime,
-the proxy score covariance is approximately zero, and thus the V-kernel vanishes.
+Very far from training examples, the posterior $p(x_0 \mid x,t)$ becomes sharply peaked. In this regime, the proxy score covariance is approximately zero, and therefore the V-kernel vanishes.
 
 As a result:
 - the effective dynamics become deterministic,
 - and no generalization through variance occurs.
 
-This explains why diffusion models do not extrapolate aggressively beyond the support of the training data.
+This explains why diffusion models do not extrapolate aggressively far beyond the support of the training data.
 
 ---
 
-#### Why deterministic structure is largely preserved
+#### 12.1.5 Why deterministic structure is largely preserved
 
-The effective dynamics derived earlier take the form of an SDE:
+The effective dynamics derived earlier take the form of a stochastic differential equation:
 
 $$
 \dot x_t
@@ -836,27 +837,27 @@ D_t s_{\mathrm{avg}}(x_t,t)
 \xi(x_t,t),
 $$
 
-where the noise term satisfies:
+where the noise term satisfies
 
 $$
 \mathbb E[\xi(x_t,t)] = 0.
 $$
 
 Because the noise has zero mean:
-- the effective PF-ODE follows deterministic PF-ODE dynamics **on average**.
+- the effective PF-ODE follows deterministic PF-ODE dynamics on average.
 
-Moreover, paths that deviate significantly from deterministic PF-ODE trajectories are less likely, since they incur a higher noise cost. As a result:
+Moreover, paths that deviate significantly from deterministic PF-ODE trajectories are less likely, since such deviations incur a higher noise cost. Therefore:
 - the most probable trajectories remain close to deterministic ones.
 
-Thus, although the effective dynamics differ from the deterministic PF-ODE, they do **not differ substantially**. Regions near training data, which are attractors of the deterministic flow, will still tend to be sampled most frequently.
+Although the effective dynamics differ from the deterministic PF-ODE, they do not differ substantially. Regions near training data, which are attractors of the deterministic flow, will still tend to be sampled most frequently.
 
 ---
 
 ### 12.2 Memorization and the V-kernel in the Small-Noise Limit
 
-Although the effective SDE description captures generalization qualitatively, it remains difficult to see explicitly how the V-kernel reshapes the output distribution.
+While the effective SDE description explains generalization qualitatively, it does not immediately reveal how the V-kernel reshapes the learned distribution.
 
-To gain insight, the paper considers a **small-noise approximation**, which is valid when models are somewhat underparameterized. This corresponds to the regime where
+To gain further insight, the paper considers a small-noise approximation, which is valid when the model is somewhat underparameterized. This corresponds to the regime where
 
 $$
 \kappa = \frac{F}{P} < 1,
@@ -866,90 +867,105 @@ so the V-kernel-induced noise is weak.
 
 ---
 
-#### Semiclassical approximation
+#### 12.2.1 Semiclassical approximation
 
-When the noise is sufficiently small, the path integral describing the typical learned distribution can be approximated using a **semiclassical (saddle-point) approximation**.
+When the noise is sufficiently small, the path integral describing the typical learned distribution can be approximated using a semiclassical (saddle-point) approximation.
 
-In this limit, the average learned distribution satisfies:
+In this limit, the average learned distribution satisfies
 
 $$
 [q(x_0)]
 \approx
 p(x_0 \mid \epsilon)
 \,
-\frac{1}{\sqrt{\det\left( \frac{1}{\kappa}
-\frac{\partial^2 S_{\mathrm{cl}}(x_0, x_T^*(x_0))}{\partial x_T \partial x_T}
-\right)}}.
+\frac{1}{\sqrt{
+\det\!\left(
+\frac{1}{\kappa}
+\frac{\partial^2 S_{\mathrm{cl}}(x_0, x_T^\ast(x_0))}
+{\partial x_T \partial x_T}
+\right)
+}}.
 $$
 
 Here:
-- \(p(x_0 \mid \epsilon)\) is the data distribution convolved with a small amount of diffusion noise,
-- \(x_T^*(x_0)\) is the most likely noise seed that flows to \(x_0\) under the deterministic PF-ODE,
-- \(S_{\mathrm{cl}}\) is the action (negative log-likelihood) of the most likely path connecting \(x_T^*\) to \(x_0\).
+- $p(x_0 \mid \epsilon)$ is the data distribution convolved with a small amount of diffusion noise,
+- $x_T^\ast(x_0)$ is the most likely noise seed that flows to $x_0$ under deterministic PF-ODE dynamics,
+- $S_{\mathrm{cl}}$ is the action (negative log-likelihood) of the most likely path connecting $x_T^\ast$ to $x_0$.
 
 ---
 
-#### Interpretation
+#### 12.2.2 Interpretation of the small-noise limit
 
 In words:
 - the typical learned distribution equals the slightly noised data distribution,
-- multiplied by a **curvature factor** that measures how sensitive the PF-ODE trajectories are to small perturbations.
+- multiplied by a curvature factor that measures how sensitive PF-ODE trajectories are to small perturbations.
 
-The V-kernel affects generalization **only through this curvature term**, by changing how likely small deviations from deterministic dynamics are.
+The V-kernel affects generalization only through this curvature term, by changing the likelihood of small deviations from deterministic PF-ODE dynamics.
 
-Although this expression clarifies the mechanism, the paper notes that it remains difficult to obtain more explicit analytic results beyond this approximation.
+Although this approximation clarifies the mechanism, the paper notes that it remains difficult to obtain more explicit analytic results beyond this limit.
 
 ---
 
 ### 12.3 Gap-Filling Inductive Bias
 
-Because the V-kernel is largest in boundary regions between training examples, generalization through variance is often expected to **fill in gaps** between data points.
+Because the V-kernel is largest in boundary regions between training examples, generalization through variance is often expected to fill in gaps between data points.
 
 However, this behavior is not guaranteed in all cases.
 
-#### Naive case: reduced boundary probability
+---
 
-In naive settings (such as those discussed in earlier sections), the added noise can actually reduce probability density in boundary regions. This happens because increased noise can cause the dynamics to move through those regions more quickly.
+#### 12.3.1 Naive behavior: reduced boundary probability
+
+In naive settings, generalization through variance can actually reduce the probability mass associated with boundary regions. This occurs because increased noise in those regions can cause trajectories to pass through them more quickly.
 
 ---
 
-#### Role of temporal correlations
+#### 12.3.2 Role of temporal correlations
 
-If the model exhibits nontrivial temporal generalization, for example through time-dependent features \(\phi(x,t)\), then the V-kernel may have nontrivial temporal autocorrelations.
+If the model exhibits nontrivial temporal generalization, for example through time-dependent features $\phi(x,t)$, the V-kernel may develop nontrivial temporal autocorrelations.
 
-The paper speculates that such autocorrelations may allow trajectories to **linger longer in boundary regions**, thereby increasing gap-filling behavior.
+The paper speculates that such temporal structure may allow trajectories to spend more time in boundary regions, enabling gap-filling behavior.
 
 ---
 
-### 12.4 Dependence on \(\epsilon\) and Model Capacity
+### 12.4 Dependence on $\epsilon$ and Model Capacity
 
-The details of generalization are strongly influenced by two parameters:
+The details of generalization depend strongly on two parameters:
 
-1. The time cutoff \(\epsilon\),
-2. The ratio \(F/P\), which determines whether the model is under- or overparameterized.
+1. The time cutoff $\epsilon$,
+2. The ratio $\frac{F}{P}$, which controls whether the model is under- or overparameterized.
 
 Larger values of either parameter increase the magnitude of the V-kernel, leading to larger deviations from deterministic PF-ODE dynamics.
 
-Figure 2 in the paper illustrates a one-dimensional example with three training points \(\{-1, 0, 1\}\). The typical learned distribution differs from both the true distribution and the deterministic PF-ODE approximation in:
-- the height of peaks near training data,
+In illustrative one-dimensional examples with training points $\{-1,0,1\}$, the average learned distribution differs from both the true distribution and the deterministic PF-ODE approximation in:
+- the heights of peaks near training data,
 - and the probability mass between them.
 
-These differences grow as \(\epsilon\) and \(F/P\) increase, but larger deviation does not necessarily imply better generalization.
+These differences increase as $\epsilon$ and $\frac{F}{P}$ grow, but larger deviation does not necessarily imply better generalization.
 
 ---
 
 ### 12.5 Feature–Noise Alignment
 
-Finally, the paper emphasizes that **generalization depends strongly on the interaction between model features and the proxy score covariance**.
+Finally, the paper emphasizes that generalization depends strongly on the interaction between model features and the proxy score covariance.
 
-Different feature sets respond differently to the same V-kernel structure.
+Different feature sets interact with the V-kernel differently, producing qualitatively different generalization behavior.
 
-Figure 3 demonstrates that:
-- the same 2D dataset can be generalized in qualitatively different ways,
+Experiments show that:
+- the same data distribution can be generalized in different ways,
 - depending on the orientation of the data,
-- and depending on whether Gaussian or Fourier features are used.
+- and depending on the feature set used (e.g., Gaussian versus Fourier features).
 
-Thus, generalization through variance is not universal:  
-it is **modulated by feature–noise alignment**, which determines which gaps are filled and which are not.
+Thus, generalization through variance is not universal: it is shaped by feature–noise alignment, which determines which gaps are filled and which are not.
 
 ---
+
+### 12.6 Summary of Section 12
+
+Generalization through variance:
+- is localized and geometry-aware,
+- preserves data manifold structure,
+- vanishes when ambiguity is absent,
+- and is controlled by both model capacity and feature structure.
+
+Rather than producing uncontrolled extrapolation, variance-driven generalization fills gaps in a constrained, inductively biased manner determined by the V-kernel.
