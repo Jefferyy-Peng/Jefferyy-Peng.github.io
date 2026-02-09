@@ -7,6 +7,8 @@ tags: Learning
 categories: sample-posts
 ---
 
+**TL;DR:** Optimizing locally instead of optimizing a global score function introduces structured noise; this noise induces variance in the learned score, which in turn induces generalization.
+
 ## 0. High-level roadmap (what the paper tries to do)
 
 The paper’s main goal is to analytically characterize the **typical learned sampling distribution** of diffusion models trained with denoising score matching (DSM), and to explain **why they generalize** (place probability mass between training examples) instead of perfectly memorizing.
@@ -957,15 +959,3 @@ Experiments show that:
 - and depending on the feature set used (e.g., Gaussian versus Fourier features).
 
 Thus, generalization through variance is not universal: it is shaped by feature–noise alignment, which determines which gaps are filled and which are not.
-
----
-
-### 12.6 Summary of Section 12
-
-Generalization through variance:
-- is localized and geometry-aware,
-- preserves data manifold structure,
-- vanishes when ambiguity is absent,
-- and is controlled by both model capacity and feature structure.
-
-Rather than producing uncontrolled extrapolation, variance-driven generalization fills gaps in a constrained, inductively biased manner determined by the V-kernel.
