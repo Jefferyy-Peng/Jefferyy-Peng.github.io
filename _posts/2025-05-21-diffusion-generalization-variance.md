@@ -36,11 +36,11 @@ $$
 p_{\text{data}}(x_0) = \frac{1}{M}\sum_{m=1}^M \delta(x_0 - \mu_m).
 $$
 
-Here $$\delta(\cdot)$$ is the Dirac delta distribution (we will define it precisely later).
+Here $$\delta(\cdot)$$ is the Dirac delta distribution.
 
 ---
 
-## 2. Forward diffusion: SDE, why the minus sign, and closed-form transition
+## 2. Forward diffusion
 
 ### 2.1 Forward SDE
 
@@ -173,6 +173,11 @@ p(x\mid t) = \frac{1}{M}\sum_{m=1}^M \mathcal N(x; \alpha_t \mu_m, S_t).
 $$
 So the forward marginal becomes a Gaussian mixture with components centered at scaled training examples.
 
+### 2.4 Reverse process as an ODE
+$$
+\dot x_t = -\beta_t x_t - D_t\, s(x_t, t),\quad t:T\to \epsilon.
+$$
+This is a Probability Flow ODE (PF-ODE), which is equivalent to the reverse SDE for $$p(x_t)$$ for all $$t$$.
 ---
 
 ## 3. Scores: true score and proxy score (with full derivations)
@@ -215,7 +220,7 @@ we get:
 $$
 \nabla_x \log \mathcal N(x;\mu,\Sigma)= -\Sigma^{-1}(x-\mu) = \Sigma^{-1}(\mu-x).
 $$
-Substitute:
+Substitute $$\mu$$ and $$\Sigma$$:
 $$
 \tilde s(x,t;x_0) = S_t^{-1}(\alpha_t x_0 - x).
 $$
