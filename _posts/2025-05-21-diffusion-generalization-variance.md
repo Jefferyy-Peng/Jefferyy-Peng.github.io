@@ -8,11 +8,10 @@ categories: sample-posts
 ---
 
 
-"""
 
 **Formatting rules (per your request):**
 - Every equation (inline or display) is wrapped in $$ ... $$.
-- I use LaTeX backslashes as single characters: I write $\text{like } \alpha_t$ as $$\alpha_t$$, **not** $$\\alpha_t$$.
+- I use LaTeX backslashes as single characters: I write $\text{like } \alpha_t$ as $$\alpha_t$$, **not** $$\alpha_t$$.
 - This writeup follows the **logic of the paper** and explicitly includes/answers the questions we discussed.
 
 ---
@@ -275,4 +274,3 @@ Differentiate w.r.t. $$x$$:
 $$
 \nabla_x p(x\mid t) = \int \nab_
 
-"""
