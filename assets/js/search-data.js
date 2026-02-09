@@ -37,7 +37,18 @@ ninja.data = [{
           handler: () => {
             window.location.href = "/teaching/";
           },
-        },{id: "post-how-diffusion-models-work",
+        },{id: "post-generalization-through-variance-in-diffusion-models",
+        
+          title: "Generalization Through Variance in Diffusion Models",
+        
+        description: "Paper summary for &quot;Generalization through Variance in Diffusion Models&quot;",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2025/diffusion-generalization-variance/";
+          
+        },
+      },{id: "post-how-diffusion-models-work",
         
           title: "How Diffusion Models Work",
         
