@@ -3,7 +3,7 @@ layout: post
 title: Generalization Through Variance in Diffusion Models
 date: 2025-11-21 16:40:16
 description: Paper summary for "Generalization through Variance in Diffusion Models"
-tags: Learning
+tags: Paper Reading
 categories: sample-posts
 ---
 
