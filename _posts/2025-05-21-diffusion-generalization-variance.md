@@ -3,8 +3,8 @@ layout: post
 title: Generalization Through Variance in Diffusion Models
 date: 2025-11-21 16:40:16
 description: Paper summary for "Generalization through Variance in Diffusion Models"
-tags: Paper Reading
-categories: sample-posts
+tags: Diffusion Generalization
+categories: Paper-Reading
 ---
 
 **TL;DR:** Optimizing locally instead of optimizing a global score function introduces structured noise; this noise induces variance in the learned score, which in turn induces generalization.

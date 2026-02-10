@@ -3,8 +3,8 @@ layout: post
 title: How Diffusion Models Work
 date: 2025-03-19 16:40:16
 description: A learning notebook for diffusion models
-tags: Learning
-categories: sample-posts
+tags: Diffusion
+categories: Learning
 ---
 
 As part of my research into the mechanisms of compositionality in generative AI, I am conducting a review of the foundational literature surrounding Diffusion Models. While these models have achieved ubiquity in text-to-image generation, understanding their underlying mathematical formulations and architectural constraints is essential for addressing their current limitations in factorization and generalization.
