@@ -8,13 +8,150 @@ categories: Paper-Reading
 ---
 
 ## TLDR
-- **Paper 2 (SIM / Swing-by Dynamics)** is a highly abstract wrapper of compositional generalization as **learning an identity mapping** on a structured Gaussian mixture. It ignores system internals (e.g., diffusion sampling, U-Nets) and develops theory for the resulting simplified problem.
-- **Paper 1 (CPC/LCS in Conditional Diffusion)** instead goes into **diffusion models directly**, showing that **local inductive bias** (sparse conditional dependencies in the score) is the mechanism that enables compositional / length generalization.
+- **Paper 1 (SIM / Swing-by Dynamics)** is a highly abstract wrapper of compositional generalization as **learning an identity mapping** on a structured Gaussian mixture. It ignores system internals (e.g., diffusion sampling, U-Nets) and develops theory for the learning dynamics of resulting simplified problem.
+- **Paper 2 (CPC/LCS in Conditional Diffusion)** instead goes into **diffusion models directly**, showing that **local inductive bias** (sparse conditional dependencies in the score) is the mechanism that enables compositional / length generalization.
 
 ---
 
-# Paper 1 — Local Mechanisms of Compositional Generalization in Conditional Diffusion (Bradley et al., 2025)
-*PDF: 2509.16447v2*  
+# Paper 1 — Swing-by Dynamics in Concept Learning and Compositional Generalization (SIM) (Yang et al., ICLR 2025)
+*PDF: [2410.08309v3](https://arxiv.org/pdf/2410.08309v3.pdf)*  
+
+## 1. Motivation: a theoretical wrapper for “concept space” diffusion results
+Prior work evaluates a diffusion model by:
+- mapping conditioning concepts to a vector,
+- using a classifier to map generated images back to concept accuracy vectors,
+- so a “good generator + classifier system” behaves like an **identity mapping** in concept space.
+
+This paper argues:
+> The salient part is the *structured organization* of concept space, not the diffusion internals.
+
+So they introduce a simplified task: **Structured Identity Mapping (SIM)**.
+
+---
+
+## 2. SIM dataset: Gaussian mixture with structured centroids
+Let $$d$$ be dimension and $$s\le d$$ be number of concept classes.
+
+Training data consists of $$s$$ Gaussian clusters aligned with coordinate axes:
+$$
+x_k^{(p)} \sim \mathcal{N}\!\left(\mu_p \mathbf{1}_p,\; \mathrm{diag}(\sigma)^2\right),
+\quad p\in [s],\; k\in[n].
+$$
+
+Interpretation:
+- $$\mu_p$$ = concept signal strength (cluster mean distance from origin),
+- $$\sigma_p$$ = concept diversity (variance along that axis).
+
+The learning problem is identity mapping with MSE:
+$$
+L(\theta)
+=
+\frac{1}{2sn}\sum_{p=1}^s\sum_{k=1}^n
+\|f(\theta; x_k^{(p)}) - x_k^{(p)}\|^2.
+$$
+
+Evaluation uses an OOD “composition” point:
+$$
+x_b = \sum_{p=1}^s \mu_p \mathbf{1}_p.
+$$
+
+---
+
+## 3. Linearization: loss in terms of covariance
+Assume the model is linear in input:
+$$
+f(\theta; x)=W_\theta x.
+$$
+
+Then (via trace trick) the loss becomes:
+$$
+L(\theta)
+=
+\frac{1}{2}\|(W_\theta - I)A^{1/2}\|_F^2,
+$$
+where the (population) covariance is diagonal:
+$$
+A=\mathbb{E}[xx^\top] = \mathrm{diag}(a),
+\quad
+a_p=
+\begin{cases}
+\sigma_p^2 + \frac{\mu_p^2}{s}, & p\le s,\\
+0, & p>s.
+\end{cases}
+$$
+
+Key: learning rates along coordinates are controlled by $$a_p$$, hence by $$\mu_p$$ and $$\sigma_p$$.
+
+---
+
+## 4. One-layer linear model: closed-form dynamics
+For $$f(W;x)=Wx$$ under gradient flow, they derive:
+$$
+f(W(t),z)_k
+=
+\mathbf{1}_{k\le s}\bigl(1-e^{-a_k t}\bigr)z_k
++
+\sum_{i=1}^s e^{-a_i t} w_{k,i}(0) z_i.
+$$
+
+Interpretation:
+- A “growth” term drives the correct identity mapping,
+- A “noise” term decays with time and initialization scale.
+
+Consequences:
+- Concepts with larger $$a_k$$ converge faster.
+- Since $$a_k$$ increases with $$\mu_k$$ and $$\sigma_k$$, generalization order is governed jointly by **signal strength** and **diversity**.
+
+This reproduces empirical “concept order” phenomena.
+
+Limitation:
+- coordinates evolve independently → no non-monotonic OOD behavior.
+
+---
+
+## 5. Deep linear model: symmetric 2-layer network and Swing-by dynamics
+They analyze:
+$$
+f(U;x)=UU^\top x,
+\quad W(t)=UU^\top.
+$$
+
+They obtain an evolution equation for Jacobian entries $$w_{i,j}$$ decomposed into:
+- growth term,
+- suppression term,
+- noise term,
+
+which yields **multi-stage dynamics**:
+1. initial growth of many Jacobian entries,
+2. one major diagonal entry grows first,
+3. it suppresses associated off-diagonal “minor” entries,
+4. next major entry grows, and so on.
+
+This staged Jacobian evolution produces an OOD trajectory that:
+- initially moves toward the OOD composition point,
+- then detours back toward training cluster(s),
+- then later returns to OOD performance.
+
+They call this **Swing-by dynamics** and connect it to a double-descent-like test loss curve (for OOD).
+
+---
+
+## 6. Empirical bridge back to diffusion
+Even though SIM is abstract, they verify in text-conditioned diffusion models that:
+- OOD concept accuracy can be non-monotonic during training,
+- matching the “Swing-by” mechanism predicted by theory.
+
+---
+
+## 7. Takeaway from Paper 2
+This paper treats compositional generalization as a **wrapper identity mapping problem**:
+- it ignores internal generative machinery,
+- and explains sequential concept learning + non-monotonic OOD curves as consequences of optimization dynamics on structured data.
+
+---
+
+# Paper 2 — Local Mechanisms of Compositional Generalization in Conditional Diffusion (Bradley et al., 2025)
+*PDF: [2509.16447v2](https://arxiv.org/pdf/2509.16447v2.pdf)*  
 
 ## 1. Motivation: why length generalization is hard
 The paper studies **length generalization** in conditional diffusion: train on scenes with a small number of objects, then test with **more** conditions (e.g., more specified locations) than seen during training.
@@ -166,142 +303,6 @@ Compositional generalization in conditional diffusion hinges on an **inductive b
 
 ---
 
-# Paper 2 — Swing-by Dynamics in Concept Learning and Compositional Generalization (SIM) (Yang et al., ICLR 2025)
-*PDF: 2410.08309v3*  
-
-## 1. Motivation: a theoretical wrapper for “concept space” diffusion results
-Prior work evaluates a diffusion model by:
-- mapping conditioning concepts to a vector,
-- using a classifier to map generated images back to concept accuracy vectors,
-- so a “good generator” behaves like an **identity mapping** in concept space.
-
-This paper argues:
-> The salient part is the *structured organization* of concept space, not the diffusion internals.
-
-So they introduce a simplified task: **Structured Identity Mapping (SIM)**.
-
----
-
-## 2. SIM dataset: Gaussian mixture with structured centroids
-Let $$d$$ be dimension and $$s\le d$$ be number of concept classes.
-
-Training data consists of $$s$$ Gaussian clusters aligned with coordinate axes:
-$$
-x_k^{(p)} \sim \mathcal{N}\!\left(\mu_p \mathbf{1}_p,\; \mathrm{diag}(\sigma)^2\right),
-\quad p\in [s],\; k\in[n].
-$$
-
-Interpretation:
-- $$\mu_p$$ = concept signal strength (cluster mean distance from origin),
-- $$\sigma_p$$ = concept diversity (variance along that axis).
-
-The learning problem is identity mapping with MSE:
-$$
-L(\theta)
-=
-\frac{1}{2sn}\sum_{p=1}^s\sum_{k=1}^n
-\|f(\theta; x_k^{(p)}) - x_k^{(p)}\|^2.
-$$
-
-Evaluation uses an OOD “composition” point:
-$$
-x_b = \sum_{p=1}^s \mu_p \mathbf{1}_p.
-$$
-
----
-
-## 3. Linearization: loss in terms of covariance
-Assume the model is linear in input:
-$$
-f(\theta; x)=W_\theta x.
-$$
-
-Then (via trace trick) the loss becomes:
-$$
-L(\theta)
-=
-\frac{1}{2}\|(W_\theta - I)A^{1/2}\|_F^2,
-$$
-where the (population) covariance is diagonal:
-$$
-A=\mathbb{E}[xx^\top] = \mathrm{diag}(a),
-\quad
-a_p=
-\begin{cases}
-\sigma_p^2 + \frac{\mu_p^2}{s}, & p\le s,\\
-0, & p>s.
-\end{cases}
-$$
-
-Key: learning rates along coordinates are controlled by $$a_p$$, hence by $$\mu_p$$ and $$\sigma_p$$.
-
----
-
-## 4. One-layer linear model: closed-form dynamics
-For $$f(W;x)=Wx$$ under gradient flow, they derive:
-$$
-f(W(t),z)_k
-=
-\mathbf{1}_{k\le s}\bigl(1-e^{-a_k t}\bigr)z_k
-+
-\sum_{i=1}^s e^{-a_i t} w_{k,i}(0) z_i.
-$$
-
-Interpretation:
-- A “growth” term drives the correct identity mapping,
-- A “noise” term decays with time and initialization scale.
-
-Consequences:
-- Concepts with larger $$a_k$$ converge faster.
-- Since $$a_k$$ increases with $$\mu_k$$ and $$\sigma_k$$, generalization order is governed jointly by **signal strength** and **diversity**.
-
-This reproduces empirical “concept order” phenomena.
-
-Limitation:
-- coordinates evolve independently → no non-monotonic OOD behavior.
-
----
-
-## 5. Deep linear model: symmetric 2-layer network and Swing-by dynamics
-They analyze:
-$$
-f(U;x)=UU^\top x,
-\quad W(t)=UU^\top.
-$$
-
-They obtain an evolution equation for Jacobian entries $$w_{i,j}$$ decomposed into:
-- growth term,
-- suppression term,
-- noise term,
-
-which yields **multi-stage dynamics**:
-1. initial growth of many Jacobian entries,
-2. one major diagonal entry grows first,
-3. it suppresses associated off-diagonal “minor” entries,
-4. next major entry grows, and so on.
-
-This staged Jacobian evolution produces an OOD trajectory that:
-- initially moves toward the OOD composition point,
-- then detours back toward training cluster(s),
-- then later returns to OOD performance.
-
-They call this **Swing-by dynamics** and connect it to a double-descent-like test loss curve (for OOD).
-
----
-
-## 6. Empirical bridge back to diffusion
-Even though SIM is abstract, they verify in text-conditioned diffusion models that:
-- OOD concept accuracy can be non-monotonic during training,
-- matching the “Swing-by” mechanism predicted by theory.
-
----
-
-## 7. Takeaway from Paper 2
-This paper treats compositional generalization as a **wrapper identity mapping problem**:
-- it ignores internal generative machinery,
-- and explains sequential concept learning + non-monotonic OOD curves as consequences of optimization dynamics on structured data.
-
----
 
 # Synthesis: How the two papers complement each other
 - **Paper 1**: compositionality depends on *mechanistic inductive bias in diffusion*: local conditional score structure.
@@ -310,5 +311,3 @@ This paper treats compositional generalization as a **wrapper identity mapping p
 Together:
 - Paper 2 explains *when* and *in what order* concept directions emerge under training dynamics.
 - Paper 1 explains *whether* a diffusion system will actually realize an additive compositional mechanism, via locality/sparsity constraints in the conditional score.
-
-
