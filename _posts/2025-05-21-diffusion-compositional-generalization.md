@@ -143,7 +143,7 @@ Even though SIM is abstract, they verify in text-conditioned diffusion models th
 
 ---
 
-## 7. Takeaway from Paper 2
+## 7. Takeaway
 This paper treats compositional generalization as a **wrapper identity mapping problem**:
 - it ignores internal generative machinery,
 - and explains sequential concept learning + non-monotonic OOD curves as consequences of optimization dynamics on structured data.
@@ -296,7 +296,7 @@ Conclusion:
 
 ---
 
-## 9. Takeaway from Paper 1
+## 9. Takeaway
 Compositional generalization in conditional diffusion hinges on an **inductive bias**:
 - representing conditional effects in a sparse / local way (LCS),
 - which corresponds to a compositional factorization of the conditional distribution (CPC).
