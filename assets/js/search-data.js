@@ -37,7 +37,18 @@ ninja.data = [{
           handler: () => {
             window.location.href = "/teaching/";
           },
-        },{id: "post-generalization-through-variance-in-diffusion-models",
+        },{id: "post-compositional-generalization-in-diffusion-models",
+        
+          title: "Compositional Generalization in Diffusion Models",
+        
+        description: "Papers for &quot;Compositional Generalization in Diffusion Models&quot;",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/diffusion-compositional-generalization/";
+          
+        },
+      },{id: "post-generalization-through-variance-in-diffusion-models",
         
           title: "Generalization Through Variance in Diffusion Models",
         
