@@ -59,11 +59,11 @@ show our model demonstrates superior performance in segmentation, detection, and
 @unpublished{peng2026SAE,
   title = {Seeing Is Not Believing: Detect and Interpret Cancer Segmentation Failures},
   author = {Mengmeng Ma, Yunxiang Peng, Tang Li, Lu Lin, Binsheng Zhao, Oguz Akin, Xi Peng},
-  note = {Under review at CVPR 2026},
+  note = {Under review at ECCV 2026},
   year = {2026},
   abstract={Accurate cancer segmentation is critical for clinical oncology, yet even state-of-the-art AI systems produce clinically significant errors. Current failure detection methods face two fundamental limitations: they cannot explain why failures occur, and improving detection sensitivity degrades segmentation quality, creating an untenable clinical trade-off between performance and reliability. We propose an approach that detects failures by examining a model's inner workings rather than its outputs. Using mechanistic interpretability tools such as Sparse Autoencoders (SAEs) to extract interpretable concepts from segmentation models, we discover that segmentation models learn clinically meaningful concepts (e.g., ``tumor,'' ``gland margin,'' ``transition zone'') in their hidden layers. Crucially, true positive and false positive predictions exhibit strikingly different concept activation patterns: true positives activate significantly more concepts with stronger magnitudes, revealing richer internal reasoning. We build hierarchical concept representations across network layers and train interpretable classifiers to identify failure patterns, enabling both accurate detection and human-understandable explanations. Experiments on prostate and pancreatic cancer datasets demonstrate that our approach outperforms output-based methods in failure detection while simultaneously maintaining good segmentation quality. },
   preview = {detect-cvpr26.jpg},
-  abbr = {CVPR},
+  abbr = {ECCV},
 }
 
 @unpublished{peng2026SyMRI,
