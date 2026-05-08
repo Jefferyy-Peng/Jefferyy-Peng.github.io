@@ -1,10 +1,14 @@
 metadata:
-  last_updated: '2026-04-24'
+  last_updated: '2026-05-08'
 papers:
+  1MVsftMAAAAJ:9yKSN-GCB0IC:
+    citations: 0
+    title: 'Inside-Out: Measuring Generalization in Vision Transformers Through Inner Workings'
+    year: '2026'
   1MVsftMAAAAJ:d1gkVwhDpl0C:
     citations: 1
-    title: '" Why Is There a Tumor?": Tell Me the Reason, Show Me the Evidence'
-    year: Unknown Year
+    title: "\u201CWhy Is There a Tumor?\u201D: Tell Me the Reason, Show Me the Evidence"
+    year: '2025'
   1MVsftMAAAAJ:u-x6o8ySG0sC:
     citations: 9
     title: "Physiolabxr: A python platform for real-time, multi-modal, brain\u2013computer interfaces and extended reality experiments"
