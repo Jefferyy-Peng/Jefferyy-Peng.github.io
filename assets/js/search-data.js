@@ -37,7 +37,40 @@ ninja.data = [{
           handler: () => {
             window.location.href = "/teaching/";
           },
-        },{id: "post-compositional-generalization-in-diffusion-models",
+        },{id: "post-counterfactual-reasoning-of-agents",
+        
+          title: "Counterfactual Reasoning of Agents",
+        
+        description: "Idea",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/cfr/";
+          
+        },
+      },{id: "post-hierarchical-reward-for-long-horizon-planning-and-agent-rl",
+        
+          title: "Hierarchical Reward for Long-Horizon Planning and Agent RL",
+        
+        description: "Idea",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/Hierarchical/";
+          
+        },
+      },{id: "post-mechanistic-understanding-of-hallucination-in-multimodal-models",
+        
+          title: "Mechanistic Understanding of Hallucination in Multimodal Models",
+        
+        description: "Idea",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/Mechanistic-Understanding-of-Hallucination-in-Multimodal-Models/";
+          
+        },
+      },{id: "post-compositional-generalization-in-diffusion-models",
         
           title: "Compositional Generalization in Diffusion Models",
         
