@@ -1,5 +1,5 @@
 metadata:
-  last_updated: '2026-07-03'
+  last_updated: '2026-07-13'
 papers:
   1MVsftMAAAAJ:9yKSN-GCB0IC:
     citations: 1
@@ -7,8 +7,8 @@ papers:
     year: '2026'
   1MVsftMAAAAJ:d1gkVwhDpl0C:
     citations: 3
-    title: "\u201CWhy Is There a Tumor?\u201D: Tell Me the Reason, Show Me the Evidence"
-    year: '2025'
+    title: '" Why Is There a Tumor?": Tell Me the Reason, Show Me the Evidence'
+    year: Unknown Year
   1MVsftMAAAAJ:u-x6o8ySG0sC:
     citations: 9
     title: "Physiolabxr: A python platform for real-time, multi-modal, brain\u2013computer interfaces and extended reality experiments"
