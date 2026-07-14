@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Mechanistic Understanding of Hallucination in Multimodal Models
-date: 2026-05-02 
+date: 2026-05-01 
 description: Idea
 tags: Hallucination
 categories: Idea
